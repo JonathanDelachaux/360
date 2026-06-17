@@ -1,59 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Vidéo 360</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script>
-        AFRAME.registerComponent('compass-lock', {
-            init: function () {
-                var self = this;
-                var videoEl = document.querySelector('#video360');
-                var manualOffset = 0;
-
-                var startExperience = function() {
-                    // Vérification et demande des permissions pour iOS
-                    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                        DeviceOrientationEvent.requestPermission()
-                            .then(permissionState => {
-                                if (permissionState === 'granted') {
-                                    window.addEventListener('deviceorientationabsolute', handleOrientation);
-                                }
-                            })
-                            .catch(console.error);
-                    } else {
-                        // Pour les appareils Android et autres
-                        window.addEventListener('deviceorientationabsolute', handleOrientation);
-                    }
-
-                    videoEl.play();
-                    var sceneEl = self.el.sceneEl;
-                    if (!sceneEl.is('vr-mode')) {
-                        sceneEl.enterVR();
-                    }
-                    window.removeEventListener('click', startExperience);
-                };
-
-                var handleOrientation = function(e) {
-                    if (e.alpha !== null) {
-                        var adjustedAlpha = e.alpha + manualOffset;
-                        if (adjustedAlpha >= 360) adjustedAlpha -= 360;
-                        if (adjustedAlpha < 0) adjustedAlpha += 360;
-                        self.el.setAttribute('rotation', '0 ' + adjustedAlpha + ' 0');
-                    }
-                };
-
-                window.addEventListener('click', startExperience);
-            }
-        });
-    </script>
+  <meta charset="utf-8">
+  <title>Vidéo 360</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script>
+    AFRAME.registerComponent('play-on-click', {
+      init: function () {
+        this.onClick = this.onClick.bind(this);
+        window.addEventListener('click', this.onClick);
+      },
+      onClick: function () {
+        var videoEl = document.querySelector('#video360');
+        videoEl.play();
+        window.removeEventListener('click', this.onClick);
+      }
+    });
+  </script>
 </head>
 <body>
-    <a-scene>
-        <a-assets>
-            <video id="video360" src="360niff.mp4" loop crossorigin="anonymous" playsinline></video>
-        </a-assets>
-        <a-videosphere id="videoSphere" src="#video360" compass-lock></a-videosphere>
-    </a-scene>
+<a-scene play-on-click>
+  <a-assets>
+    <video id="video360" src="360niff.mp4" loop crossorigin="anonymous" playsinline></video>
+  </a-assets>
+  <a-videosphere src="#video360"></a-videosphere>
+</a-scene>
 </body>
 </html>
