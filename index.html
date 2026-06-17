@@ -4,13 +4,45 @@
 <meta charset="utf-8">
 <title>Vidéo 360</title>
 <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+<script>
+AFRAME.registerComponent('compass-lock', {
+  init: function () {
+    var self = this;
+    var videoEl = document.querySelector('#video360');
+    
+    // Vous pouvez modifier cette valeur pour ajuster
+    // l'alignement manuellement (en degrés, de 0 à 360)
+    var manualOffset = 0; 
+
+    var startExperience = function() {
+      videoEl.play();
+      var sceneEl = self.el.sceneEl;
+      if (!sceneEl.is('vr-mode')) {
+        sceneEl.enterVR();
+      }
+      window.removeEventListener('click', startExperience);
+    };
+
+    window.addEventListener('click', startExperience);
+
+    window.addEventListener('deviceorientationabsolute', function(e) {
+      if (e.alpha !== null) {
+        var adjustedAlpha = e.alpha + manualOffset;
+        if (adjustedAlpha >= 360) adjustedAlpha -= 360;
+        if (adjustedAlpha < 0) adjustedAlpha += 360;
+        self.el.setAttribute('rotation', `0 ${adjustedAlpha} 0`);
+      }
+    }, { once: false });
+  }
+});
+</script>
 </head>
 <body>
 <a-scene>
 <a-assets>
-<video id="video360" src="360niff.mp4" autoplay loop crossorigin="anonymous" playsinline></video>
+<video id="video360" src="360niff.mp4" loop crossorigin="anonymous" playsinline></video>
 </a-assets>
-<a-videosphere src="#video360" rotation="0 0 0"></a-videosphere>
+<a-videosphere id="videoSphere" src="#video360" compass-lock></a-videosphere>
 </a-scene>
 </body>
 </html>
