@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Vidéo 360° Fixe</title>
-
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
   <style>
     html, body {
       margin: 0;
@@ -16,7 +14,6 @@
       background: black;
       font-family: Arial, sans-serif;
     }
-
     #startButton {
       position: fixed;
       inset: 0;
@@ -29,41 +26,19 @@
     }
   </style>
 </head>
-
 <body>
-  <button id="startButton">
-    Touchez pour lancer la vidéo 360°
-  </button>
+  <button id="startButton">Touchez pour lancer la vidéo 360°</button>
 
-  <a-scene
-    vr-mode-ui="enabled: true"
-    embedded
-    device-orientation-permission-ui="enabled: true"
-    renderer="antialias: true">
-
+  <a-scene embedded vr-mode-ui="enabled: true" device-orientation-permission-ui="enabled: true" renderer="antialias: true">
     <a-assets>
-      <video
-        id="video360"
-        src="360niff.mp4"
-        preload="auto"
-        loop
-        playsinline
-        webkit-playsinline
-        crossorigin="anonymous">
-      </video>
+      <video id="video360" src="360niff.mp4" loop preload="auto" playsinline webkit-playsinline></video>
     </a-assets>
 
-    <!-- Ajuste la valeur Y pour aligner ton mur -->
-    <a-videosphere
-      src="#video360"
-      rotation="0 0 0">
-    </a-videosphere>
+    <!-- Vidéo fixe dans l’espace virtuel -->
+    <a-videosphere src="#video360" rotation="0 0 0"></a-videosphere>
 
-    <a-camera
-      position="0 1.6 0"
-      look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true">
+    <a-camera look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true">
     </a-camera>
-
   </a-scene>
 
   <script>
@@ -84,5 +59,4 @@
 
     button.addEventListener('click', startVideo);
   </script>
-</body>
-</html>
+</
