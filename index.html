@@ -5,10 +5,24 @@
 <title>Vidéo 360</title>
 <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
 <script>
-AFRAME.registerComponent('absolute-orientation', {
+AFRAME.registerComponent('compass-lock', {
   init: function () {
+    var self = this;
     this.onClick = this.onClick.bind(this);
     window.addEventListener('click', this.onClick);
+    
+    // Vous pouvez modifier cette valeur pour ajuster
+    // l'alignement manuellement (en degrés, de 0 à 360)
+    var manualOffset = 0; 
+    
+    window.addEventListener('deviceorientationabsolute', function(e) {
+      if (e.alpha !== null) {
+        var adjustedAlpha = e.alpha + manualOffset;
+        if (adjustedAlpha >= 360) adjustedAlpha -= 360;
+        if (adjustedAlpha < 0) adjustedAlpha += 360;
+        self.el.setAttribute('rotation', `0 ${adjustedAlpha} 0`);
+      }
+    }, { once: false });
   },
   onClick: function () {
     var videoEl = document.querySelector('#video360');
@@ -24,11 +38,12 @@ AFRAME.registerComponent('absolute-orientation', {
 </script>
 </head>
 <body>
-<a-scene absolute-orientation>
+<a-scene>
 <a-assets>
-<video id="video360" src="360niff.mp4" loop crossorigin="anonymous" playsinline></video>
+<video id="video360" src="360NIFFTtoutaccroché.mp4" loop crossorigin="anonymous" playsinline></video>
 </a-assets>
-<a-videosphere src="#video360" rotation="0 0 0"></a-videosphere>
+<a-videosphere id="videoSphere" src="#video360" compass-lock></a-videosphere>
 </a-scene>
 </body>
 </html>
+
