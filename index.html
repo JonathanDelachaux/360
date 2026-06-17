@@ -1,48 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<meta charset="utf-8">
-<title>Vidéo 360</title>
-<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-<script>
-AFRAME.registerComponent('compass-lock', {
-  init: function () {
-    var self = this;
-    var videoEl = document.querySelector('#video360');
-    
-    // Vous pouvez modifier cette valeur pour ajuster
-    // l'alignement manuellement (en degrés, de 0 à 360)
-    var manualOffset = 0; 
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vidéo 360° NIFFF</title>
 
-    var startExperience = function() {
-      videoEl.play();
-      var sceneEl = self.el.sceneEl;
-      if (!sceneEl.is('vr-mode')) {
-        sceneEl.enterVR();
-      }
-      window.removeEventListener('click', startExperience);
-    };
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-    window.addEventListener('click', startExperience);
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+      font-family: Arial, sans-serif;
+    }
 
-    window.addEventListener('deviceorientationabsolute', function(e) {
-      if (e.alpha !== null) {
-        var adjustedAlpha = e.alpha + manualOffset;
-        if (adjustedAlpha >= 360) adjustedAlpha -= 360;
-        if (adjustedAlpha < 0) adjustedAlpha += 360;
-        self.el.setAttribute('rotation', `0 ${adjustedAlpha} 0`);
-      }
-    }, { once: false });
-  }
-});
-</script>
+    #startButton {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: black;
+      color: white;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
-<a-scene>
-<a-assets>
-<video id="video360" src="360niff.mp4" loop crossorigin="anonymous" playsinline></video>
-</a-assets>
-<a-videosphere id="videoSphere" src="#video360" compass-lock></a-videosphere>
-</a-scene>
+  <button id="startButton">
+    Touchez pour lancer la vidéo 360°
+  </button>
+
+  <a-scene
+    vr-mode-ui="enabled: true"
+    embedded
+    device-orientation-permission-ui="enabled: true"
+    renderer="antialias: true">
+
+    <a-assets>
+      <video
+        id="video360"
+        src="360niff.mp4"
+        preload="auto"
+        loop
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous">
+      </video>
+    </a-assets>
+
+    <!--
+      ORIENTATION NORD-SUD :
+      Change uniquement la valeur Y ci-dessous.
+
+      rotation="0 0 0"    = orientation de base
+      rotation="0 90 0"   = tourne de 90°
+      rotation="0 180 0"  = tourne de 180°
+      rotation="0 -90 0"  = tourne de -90°
+
+      Pour ajuster précisément :
+      rotation="0 35 0"
+      rotation="0 -42 0"
+    -->
+    <a-videosphere
+      src="#video360"
+      rotation="0 0 0">
+    </a-videosphere>
+
+    <!-- Caméra fixe au départ, puis gyroscope/tactile du visiteur -->
+    <a-camera
+      id="camera"
+      position="0 1.6 0"
+      rotation="0 0 0"
+      look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true">
+    </a-camera>
+
+  </a-scene>
+
+  <script>
+    const video = document.getElementById('video360');
+    const button = document.getElementById('startButton');
+    const camera = document.getElementById('camera');
+
+    // Empêche une ancienne orientation de caméra au lancement.
+    function resetView() {
+      camera.setAttribute('rotation', '0 0 0');
+    }
+
+    async function startVideo() {
+      try {
+        video.muted = false;
+        video.volume = 1;
+        resetView();
+        await video.play();
+        button.style.display = 'none';
+      } catch (err) {
+        // Certains iPhones refusent encore le son immédiatement.
+        // Dans ce cas, on relance muet, puis l'utilisateur pourra monter le son.
+        video.muted = true;
+        await video.play();
+        button.style.display = 'none';
+      }
+    }
+
+    button.addEventListener('click', startVideo);
+    button.addEventListener('touchstart', startVideo, { once: true });
+
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      video.play();
+    });
+  </script>
 </body>
 </html>
