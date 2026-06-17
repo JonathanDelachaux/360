@@ -4,13 +4,30 @@
 <meta charset="utf-8">
 <title>Vidéo 360</title>
 <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+<script>
+AFRAME.registerComponent('play-on-click', {
+  init: function () {
+    this.onClick = this.onClick.bind(this);
+    window.addEventListener('click', this.onClick);
+  },
+  onClick: function () {
+    var videoEl = document.querySelector('#video360');
+    videoEl.play();
+    var sceneEl = this.el.sceneEl;
+    if (sceneEl.is('vr-mode')) return;
+    sceneEl.enterVR(); // Entre en mode VR/Fullscreen
+    window.removeEventListener('click', this.onClick);
+  }
+});
+</script>
 </head>
 <body>
-<a-scene>
+<a-scene play-on-click>
 <a-assets>
-<video id="video360" src="360niff.mp4" autoplay loop crossorigin="anonymous" playsinline></video>
+<video id="video360" src="360niff.mp4" loop crossorigin="anonymous" playsinline></video>
 </a-assets>
-<a-videosphere src="#video360" rotation="0 45 0"></a-videosphere>
+<!-- L'orientation est gérée par le gyroscope du téléphone en mode immersif -->
+<a-videosphere src="#video360"></a-videosphere>
 </a-scene>
 </body>
 </html>
