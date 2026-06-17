@@ -53,18 +53,30 @@
       </video>
     </a-assets>
 
-    <!-- Fixe l’orientation initiale.
-         Ajuste la valeur Y pour aligner ton "nord" -->
+    <!--
+      ORIENTATION NORD-SUD :
+      Change uniquement la valeur Y ci-dessous.
+
+      rotation="0 0 0"    = orientation de base
+      rotation="0 90 0"   = tourne de 90°
+      rotation="0 180 0"  = tourne de 180°
+      rotation="0 -90 0"  = tourne de -90°
+
+      Pour ajuster précisément :
+      rotation="0 35 0"
+      rotation="0 -42 0"
+    -->
     <a-videosphere
       src="#video360"
       rotation="0 0 0">
     </a-videosphere>
 
+    <!-- Caméra fixe au départ, puis gyroscope/tactile du visiteur -->
     <a-camera
       id="camera"
       position="0 1.6 0"
       rotation="0 0 0"
-      look-controls="enabled: true; magicWindowTrackingEnabled: false; touchEnabled: true; mouseEnabled: true">
+      look-controls="enabled: true; magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true">
     </a-camera>
 
   </a-scene>
@@ -74,17 +86,23 @@
     const button = document.getElementById('startButton');
     const camera = document.getElementById('camera');
 
-    // Fonction pour démarrer la vidéo avec son
+    // Empêche une ancienne orientation de caméra au lancement.
+    function resetView() {
+      camera.setAttribute('rotation', '0 0 0');
+    }
+
     async function startVideo() {
       try {
         video.muted = false;
-        video.volume = 1.0;
-        video.play();
+        video.volume = 1;
+        resetView();
+        await video.play();
         button.style.display = 'none';
       } catch (err) {
-        // Si impossible, redémarre muet (ex. iPhone)
+        // Certains iPhones refusent encore le son immédiatement.
+        // Dans ce cas, on relance muet, puis l'utilisateur pourra monter le son.
         video.muted = true;
-        video.play();
+        await video.play();
         button.style.display = 'none';
       }
     }
