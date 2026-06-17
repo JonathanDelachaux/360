@@ -11,8 +11,8 @@ AFRAME.registerComponent('compass-lock', {
     this.onClick = this.onClick.bind(this);
     window.addEventListener('click', this.onClick);
     
-    // Vous pouvez modifier cette valeur pour ajuster
-    // l'alignement manuellement (en degrés, de 0 à 360)
+    // Vous pouvez modifier cette valeur pour aligner
+    // l'affichage manuellement (en degrés, de 0 à 360)
     var manualOffset = 0; 
     
     window.addEventListener('deviceorientationabsolute', function(e) {
@@ -40,10 +40,9 @@ AFRAME.registerComponent('compass-lock', {
 <body>
 <a-scene>
 <a-assets>
-<video id="video360" src="360niff.mp4" loop crossorigin="anonymous" playsinline></video>
+<video id="video360" src="360NIFFTtoutaccroché.mp4" loop crossorigin="anonymous" playsinline></video>
 </a-assets>
 <a-videosphere id="videoSphere" src="#video360" compass-lock></a-videosphere>
 </a-scene>
 </body>
 </html>
-
